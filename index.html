@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
+<title>Millbrook Dispatch Mapbook</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+<style>
+:root {
+  --primary: #00e5ff;
+  --bg: #0a0f1c;
+  --panel: rgba(20, 30, 48, 0.85);
+  --panel-solid: #14223e;
+  --text: #f8fafc;
+  --dim: #94a3b8;
+  --border: rgba(255,255,255,0.08);
+  --red: #ff3b3b;
+  --orange: #ff9d00;
+  --green: #00ff88;
+  --yellow: #facc15;
+  --blue: #38bdf8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(0,229,255,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(255,59,59,0.05) 0%, transparent 50%);
+  color: var(--text);
+  min-height: 100vh;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+}
+.app {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem 1rem 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+header {
+  text-align: center;
+  padding: 0.75rem 0 0.25rem;
+}
+h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.subtitle { color: var(--dim); font-size: 0.85rem; margin-top: 0.15rem; }
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.3rem;
+}
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.7rem 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tab.active { background: rgba(0,229,255,0.15); color: var(--primary); }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+}
+textarea, .search-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  background: rgba(0,0,0,0.3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  outline: none;
+}
+textarea { min-height: 90px; resize: vertical; }
+textarea:focus, .search-input:focus { border-color: var(--primary); }
+.search-input { font-size: 1.1rem; padding: 1rem 1.1rem; }
+.btn-row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+button.action {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: rgba(0,229,255,0.1);
+  color: var(--primary);
+  padding: 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.action:active { background: rgba(0,229,255,0.25); }
+button.action.secondary { background: transparent; color: var(--dim); }
+button.action.danger { background: rgba(255,59,59,0.12); color: var(--red); }
+.parsed {
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.25);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--green);
+}
+.parsed b { color: #fff; font-weight: 700; }
+.label-row { display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem; }
+.label-row label { font-size: 0.85rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.results { display: flex; flex-direction: column; gap: 0.6rem; }
+.result {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.result:active { transform: scale(0.98); }
+.result.active { border-color: var(--primary); background: rgba(0,229,255,0.07); }
+.badge {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #0d1424;
+  border: 2px solid var(--primary);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.badge.s2 { border-color: var(--green); }
+.badge.s3 { border-color: var(--orange); }
+.badge.s4 { border-color: var(--red); }
+.badge .v { font-size: 1.5rem; font-weight: 900; color: var(--primary); line-height: 1; }
+.badge.s2 .v { color: var(--green); }
+.badge.s3 .v { color: var(--orange); }
+.badge.s4 .v { color: var(--red); }
+.badge .l { font-size: 0.55rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.15rem; }
+.details { flex: 1; min-width: 0; }
+.street { font-size: 1rem; font-weight: 700; }
+.meta { font-size: 0.78rem; color: var(--dim); margin-top: 0.2rem; }
+.meta .pg { color: var(--yellow); font-weight: 700; }
+.nav-btn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  background: rgba(0,229,255,0.12);
+  border: 1px solid rgba(0,229,255,0.35);
+  border-radius: 12px;
+  padding: 0.55rem 0.7rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.1;
+  min-width: 64px;
+  transition: background 0.15s, transform 0.15s;
+}
+.nav-btn:hover { background: rgba(0,229,255,0.22); }
+.nav-btn:active { transform: scale(0.96); }
+.nav-btn .nav-icon { font-size: 1.2rem; }
+.nav-btn .nav-label { font-size: 0.7rem; letter-spacing: 0.3px; }
+.empty { padding: 1.5rem; text-align: center; color: var(--dim); font-size: 0.9rem; }
+.viewer { display: none; }
+.viewer.show { display: block; }
+.viewer-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--panel-solid);
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px 12px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+.viewer-bar .pg-label { font-size: 0.85rem; color: var(--dim); }
+.viewer-bar .pg-label b { color: #fff; font-size: 1rem; }
+.viewer-bar .spacer { flex: 1; }
+.viewer-bar button {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.viewer-bar button:active { background: rgba(255,255,255,0.16); }
+.map-img-wrap {
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+  border: 1px solid var(--border);
+  border-top: none;
+  overflow: hidden;
+  position: relative;
+  min-height: 300px;
+  display: flex; align-items: center; justify-content: center;
+}
+.map-img-wrap img { width: 100%; height: auto; display: block; }
+.map-img-wrap.loading::after {
+  content: "Loading map...";
+  color: #888; font-size: 0.9rem;
+}
+.fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+  background: var(--primary);
+  color: #001018;
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  font-size: 0.95rem;
+  cursor: pointer;
+  z-index: 50;
+}
+.hint { font-size: 0.78rem; color: var(--dim); margin-top: 0.4rem; line-height: 1.4; }
+.hint code { background: rgba(255,255,255,0.07); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.78rem; }
+.section-title { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin: 0.3rem 0 0.4rem; }
+.alert-banner {
+  display: none;
+  background: rgba(250,204,21,0.1);
+  border: 1px solid rgba(250,204,21,0.3);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  color: var(--yellow);
+}
+.alert-banner.show { display: block; }
+@media (max-width: 480px) {
+  h1 { font-size: 1.3rem; }
+  .badge { width: 56px; height: 56px; }
+  .badge .v { font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Millbrook Dispatch</h1>
+    <p class="subtitle">Mapbook Lookup &middot; Station &middot; Page</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="alert">From Alert</button>
+    <button class="tab" data-tab="search">Search Address</button>
+    <button class="tab" data-tab="browse">Browse Pages</button>
+  </div>
+
+
+  <!-- Tab 1: Paste IamResponding alert text -->
+  <section class="panel" id="tab-alert">
+    <div class="label-row">
+      <label>Paste alert text</label>
+      <span style="font-size:0.7rem; color: var(--dim);">from IamResponding text/email</span>
+    </div>
+    <textarea id="alertText" placeholder="Paste the full IamResponding notification text here..."></textarea>
+    <div class="btn-row">
+      <button class="action" id="btnExtract">Extract &amp; Look Up</button>
+      <button class="action secondary" id="btnPaste">Paste from Clipboard</button>
+      <button class="action secondary" id="btnClear">Clear</button>
+    </div>
+    <div class="parsed" id="parsedBox" style="display:none;"></div>
+    <p class="hint">Tip: install this app on your phone (Add to Home Screen). Then in your messaging app, tap a fire alert &rarr; <b>Share</b> &rarr; <b>Millbrook Dispatch</b> &mdash; the alert is parsed automatically.</p>
+  </section>
+
+  <!-- Tab 2: Manual address search -->
+  <section class="panel" id="tab-search" style="display:none;">
+    <div class="label-row"><label>Search</label></div>
+    <input type="text" class="search-input" id="searchInput" placeholder="Street name or address..." autocomplete="off" />
+    <p class="hint">Examples: <code>ABBY LANE</code>, <code>123 grandview</code>, <code>cobbs ford</code>.</p>
+  </section>
+
+  <!-- Tab 3: Browse all pages -->
+  <section class="panel" id="tab-browse" style="display:none;">
+    <div class="label-row"><label>Jump to printed page</label></div>
+    <input type="text" class="search-input" id="pageJumpInput" placeholder='e.g. "47" or "114A"' inputmode="text" />
+    <div class="hint" id="pageJumpList" style="margin-top:0.7rem; line-height:1.9;"></div>
+  </section>
+
+  <div class="alert-banner" id="hint"></div>
+
+  <!-- Results list -->
+  <div class="section-title" id="resultsTitle" style="display:none;">Matches</div>
+  <div class="results" id="results"></div>
+
+  <!-- Map page viewer -->
+  <div class="viewer" id="viewer">
+    <div class="viewer-bar">
+      <div class="pg-label">Mapbook page <b id="vpLabel">—</b></div>
+      <div class="spacer"></div>
+      <button id="vpPrev" title="Previous page">&larr; Prev</button>
+      <button id="vpNext" title="Next page">Next &rarr;</button>
+      <button id="vpOpen" title="Open full image">Open</button>
+    </div>
+    <div class="map-img-wrap" id="vpWrap">
+      <img id="vpImg" alt="Mapbook page" />
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="installBtn" style="display:none;">Install App</button>
+
+<script>
+(() => {
+'use strict';
+
+// ---------- App state ----------
+let streets = [];        // [{sta, street, page, crossStreet}]
+let labels = {};         // { "032": "1", ... }
+let labelToIndex = {};   // { "1": 32, "47": 70, ... }
+let sortedLabels = [];   // sorted printed labels
+let currentLabel = null;
+let lastParsed = null;   // last parsed address (for Maps navigation)
+
+// Detect platform for choosing the right maps URL scheme.
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+function buildMapsUrl(houseNum, streetName) {
+  // Build the navigation address: include the house number if we have it,
+  // and always append the city/state for accuracy.
+  const addr = [houseNum, streetName, 'Millbrook, AL'].filter(Boolean).join(' ');
+  const enc = encodeURIComponent(addr);
+  if (IS_IOS) {
+    // Apple Maps universal link — opens the Maps app on iOS, falls back to web.
+    return `https://maps.apple.com/?daddr=${enc}&dirflg=d`;
+  }
+  // Google Maps universal directions link — opens the app if installed.
+  return `https://www.google.com/maps/dir/?api=1&destination=${enc}&travelmode=driving`;
+}
+
+// ---------- Load data ----------
+// Bump DATA_VERSION whenever streets.json or page_labels.json changes — busts
+// the browser's HTTP cache (and the SW cache, since `sw.js` keys off it too).
+const DATA_VERSION = '2';
+
+async function loadData() {
+  const [streetsRes, labelsRes] = await Promise.all([
+    fetch('streets.json?v=' + DATA_VERSION).then(r => r.json()),
+    fetch('maps/page_labels.json?v=' + DATA_VERSION).then(r => r.json()),
+  ]);
+  streets = streetsRes.filter(s => {
+    if (!s.street) return false;
+    const letters = (s.street.match(/[A-Za-z]/g) || []).length;
+    const digits  = (s.street.match(/\d/g) || []).length;
+    // Need a real word, and must have more letters than digits.
+    if (letters < 4) return false;
+    if (digits > letters) return false;
+    // Drop the OCR meta-junk that snuck through ("SEE MAP", "CARE", lone fragments).
+    if (/\bSEE\s+MAP\b/i.test(s.street)) return false;
+    if (/^CARE\b/i.test(s.street)) return false;
+    return true;
+  });
+  labels = labelsRes;
+  labelToIndex = {};
+  for (const [pdfIdx, lbl] of Object.entries(labels)) {
+    labelToIndex[lbl] = parseInt(pdfIdx, 10);
+  }
+  sortedLabels = Object.keys(labelToIndex).sort((a, b) => {
+    const an = parseInt(a, 10), bn = parseInt(b, 10);
+    if (an !== bn) return an - bn;
+    return a.localeCompare(b);
+  });
+  populatePageJumpList();
+}
+
+// ---------- Address parsing ----------
+// Extracts a likely street address from arbitrary IamResponding alert text.
+// Supported shapes (typical of dispatch alerts):
+//   "Structure Fire 1234 MAIN ST MILLBROOK 36054 X-ST: GOBER RD/ABBY LN"
+//   "EMS - 100 BLOCK ABBY LN"
+//   "MEDICAL: 567 ABBY LN, MILLBROOK / Cross: GRANDVIEW"
+const STREET_TYPES = [
+  'STREET','ST','ROAD','RD','LANE','LN','DRIVE','DR','BOULEVARD','BLVD',
+  'AVENUE','AVE','COURT','CT','CIRCLE','CIR','PLACE','PL','WAY','PARKWAY','PKWY',
+  'TRAIL','TRL','TERRACE','TER','LOOP','HIGHWAY','HWY','BEND','PASS','RUN',
+  'COVE','CHASE','PARK'
+];
+const STREET_TYPE_RE = new RegExp(
+  '\\b(?:' + STREET_TYPES.join('|') + ')\\b',
+  'i'
+);
+
+function extractAddress(raw) {
+  if (!raw) return null;
+  let text = raw.replace(/\r/g, '').replace(/ /g, ' ');
+  // Strip URLs that often appear at the end of alert texts.
+  text = text.replace(/https?:\/\/\S+/g, ' ');
+  // Try cross-street capture first
+  let crossStreet = null;
+  const crossMatch = text.match(/(?:X[\s-]?ST|CROSS|CROSS\s*ST(?:REET)?)\s*[:\-]?\s*([^\n]+)/i);
+  if (crossMatch) {
+    crossStreet = crossMatch[1].trim().replace(/[.,;]+$/, '');
+    // If there's a city/state after the cross, drop it
+    crossStreet = crossStreet.replace(/\s+(MILLBROOK|DEATSVILLE|PRATTVILLE|COOSADA)\b.*$/i, '').trim();
+  }
+
+  // Highway/interstate streets like "I-65", "HWY 14" come up a lot in dispatch
+  // alerts. Catch those before the generic street-type pattern so the "I-" prefix
+  // doesn't get treated as the address number. We deliberately do NOT match
+  // "AL <digits>" — that pattern collides with the zip "AL 36054".
+  const hwyRe = /\b((?:I[-\s]?\d{1,3}|HWY\s*\d{1,4}|US\s*HWY\s*\d{1,4}|COUNTY\s+ROAD\s+\d{1,4})(?:\s+[A-Za-z][A-Za-z .\-]{1,40}?\b(?:SERVICE\s+ROAD|SERVICE\s+RD|ROAD|RD|HIGHWAY|HWY|PKWY|PARKWAY)\b)?)/i;
+  let house = null, street = null;
+  const hwyM = text.match(hwyRe);
+  if (hwyM) {
+    street = hwyM[1].trim().replace(/\s+/g, ' ');
+    const idx = text.search(hwyRe);
+    const before = text.slice(Math.max(0, idx - 20), idx);
+    const numM = before.match(/(\d{1,6})\s*$/);
+    if (numM) house = numM[1];
+  }
+
+  if (!street) {
+    // Pattern: house number (1-6 digits) then 1-4 words then street type.
+    const re1 = new RegExp(
+      '(?:^|[\\s,;:\\-])(\\d{1,6})\\s+([A-Za-z][A-Za-z .\\-]{0,60}?\\b(?:' + STREET_TYPES.join('|') + ')\\b\\.?)',
+      'i'
+    );
+    const m1 = text.match(re1);
+    if (m1) {
+      house = m1[1];
+      street = m1[2].trim().replace(/\s+/g, ' ').replace(/[.,]+$/, '');
+    } else {
+      // No house number — try a "BLOCK" form like "100 BLOCK ABBY LN".
+      const re2 = new RegExp(
+        '(\\d{1,6})\\s*(?:BLOCK|BLK)\\s+([A-Za-z][A-Za-z .\\-]{0,60}?\\b(?:' + STREET_TYPES.join('|') + ')\\b)',
+        'i'
+      );
+      const m2 = text.match(re2);
+      if (m2) { house = m2[1]; street = m2[2].trim(); }
+    }
+  }
+
+  if (!street) {
+    // Last resort: take the LAST 1-3 words ending with a street type. We capture
+    // "JAMES ROAD" not "Fire on JAMES ROAD".
+    const re3 = new RegExp(
+      '\\b((?:[A-Z][A-Za-z\\-]+\\s+){0,2}[A-Z][A-Za-z\\-]+\\s+(?:' + STREET_TYPES.join('|') + ')\\b)',
+      // Note: explicitly case-sensitive — we want title/upper-case words, which
+      // dispatch text uses for street names. This sidesteps "Fire on" matching.
+    );
+    const m3 = text.match(re3);
+    if (m3) street = m3[1].trim();
+  }
+
+  if (!street) return null;
+  // Strip city/state/zip from the END of the parsed street.
+  // Only strip a city name when it's followed by a comma OR the AL+zip pattern,
+  // so we don't mangle "DEATSVILLE HWY" (the street) into "" (empty).
+  street = street
+    .replace(/,\s+(MILLBROOK|DEATSVILLE|PRATTVILLE|COOSADA)\b.*$/i, '')
+    .replace(/\s+(MILLBROOK|DEATSVILLE|PRATTVILLE|COOSADA)\s+(AL|ALA(?:BAMA)?)\b.*$/i, '')
+    .replace(/,?\s+(AL|ALA(?:BAMA)?)\s+\d{5}\b.*$/i, '')
+    .replace(/\s+\d{5}(-\d{4})?\b.*$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return { house, street, crossStreet, raw };
+}
+
+// ---------- Search ----------
+const STOPWORDS = new Set([
+  'al','ala','alabama','millbrook','deatsville','deatsvile','prattville','coosada',
+  'ave','st','rd','dr','ln','ct','cir','blvd','pl','way','pkwy','trl','ter','hwy','tr','run','cove'
+]);
+// Note: we keep these as soft stopwords — useful for matching but not required.
+// City names removed at the EXTRACTOR step (only when in city-tail position).
+// Keeping them here would also strip "DEATSVILLE" from "DEATSVILLE HWY" queries.
+const HARD_STOPWORDS = new Set(['al','ala','alabama']);
+
+// Map of street-type aliases used both in user queries and in our dataset's street names.
+// Key = canonical type word that appears in streets.json (uppercase).
+const TYPE_ALIASES = {
+  STREET: ['STREET', 'ST'],
+  ROAD: ['ROAD', 'RD'],
+  LANE: ['LANE', 'LN'],
+  DRIVE: ['DRIVE', 'DR'],
+  BOULEVARD: ['BOULEVARD', 'BLVD'],
+  AVENUE: ['AVENUE', 'AVE'],
+  COURT: ['COURT', 'CT'],
+  CIRCLE: ['CIRCLE', 'CIR'],
+  PLACE: ['PLACE', 'PL'],
+  WAY: ['WAY'],
+  PARKWAY: ['PARKWAY', 'PKWY'],
+  TRAIL: ['TRAIL', 'TRL'],
+  TERRACE: ['TERRACE', 'TER'],
+  LOOP: ['LOOP'],
+  HIGHWAY: ['HIGHWAY', 'HWY'],
+  BEND: ['BEND'],
+  COVE: ['COVE'],
+  CHASE: ['CHASE'],
+  PASS: ['PASS'],
+  RUN: ['RUN'],
+  PARK: ['PARK'],
+};
+const ALIAS_TO_CANONICAL = (() => {
+  const m = {};
+  for (const [canon, aliases] of Object.entries(TYPE_ALIASES)) {
+    for (const a of aliases) m[a.toLowerCase()] = canon;
+  }
+  return m;
+})();
+
+// Extract a "house number" candidate from the start of a query (the address #).
+// We treat any leading number ≥ 100 (or with 4+ digits) as the address number,
+// not a highway number. Highway numbers like "14" or "65" are typically <= 3 digits
+// without a 4-digit context.
+function tokenize(q) {
+  const tokens = q.toLowerCase().replace(/[,./]/g, ' ').split(/\s+/).filter(Boolean);
+  return tokens.filter(t => {
+    // Hyphenated tokens like "i-65" — keep them.
+    if (/^[a-z]+-\d+$/.test(t)) return true;
+    // Bare digit tokens — keep IF they look like a highway number (1-3 digits)
+    // and aren't the leading address number. We can't tell here, so include them
+    // and let the scorer dock irrelevant ones.
+    if (/^\d+$/.test(t)) return t.length <= 3;
+    return !HARD_STOPWORDS.has(t) && t.length >= 2;
+  });
+}
+
+// Given a street like "DEATSVILLE HWY (0 - 800 BLK)", parse out the block range.
+function parseBlockRange(street) {
+  // Catches "(00 - 800 BLK)", "(2700-3700 BLK)", "(2300 - 2500 BLIK)" etc.
+  const m = street.match(/\((\d{1,5})\s*-\s*(\d{1,5})\s*BL[IY]?K?\)/i);
+  if (!m) return null;
+  const lo = parseInt(m[1], 10);
+  const hi = parseInt(m[2], 10);
+  return { lo: Math.min(lo, hi), hi: Math.max(lo, hi) };
+}
+
+function searchStreets(q, opts = {}) {
+  const terms = tokenize(q);
+  if (!terms.length) return [];
+
+  // Detect a desired canonical street-type from the query (e.g. "rd" -> ROAD).
+  let wantType = null;
+  for (let i = terms.length - 1; i >= 0; i--) {
+    const c = ALIAS_TO_CANONICAL[terms[i]];
+    if (c) { wantType = c; break; }
+  }
+  // Numeric terms in the query may be a highway number (HWY 14) or a route number.
+  const numTerms = terms.filter(t => /^\d+$/.test(t));
+  // Non-type, non-pure-digit terms — these are the meaningful street-name words.
+  const nameTerms = terms.filter(t => !ALIAS_TO_CANONICAL[t] && !/^\d+$/.test(t));
+
+  // Optional house number — used to disambiguate which "(NN - NN BLK)" range
+  // a multi-block street the alert is in.
+  const houseNum = opts.houseNum != null ? parseInt(opts.houseNum, 10) : null;
+
+  const scored = streets.map(s => {
+    const street = s.street.toLowerCase();
+    const cross = (s.crossStreet || '').toLowerCase();
+    let score = 0, matched = 0;
+    let allInStreet = true;
+    let hitName = false; // any nameTerm hit the street name?
+    for (const t of nameTerms) {
+      if (street.includes(t)) { score += 10; matched++; hitName = true; }
+      else { allInStreet = false; if (cross.includes(t)) { score += 2; matched++; } }
+    }
+    // Type-match bonus / mismatch penalty.
+    let streetHasType = false;
+    if (wantType) {
+      const aliases = TYPE_ALIASES[wantType];
+      streetHasType = aliases.some(a => new RegExp('\\b' + a + '\\b', 'i').test(s.street));
+      if (streetHasType) { score += 25; matched++; }
+      else { score -= 8; }
+    }
+    // Highway-number bonus: only meaningful when the street is the right "type" —
+    // otherwise the digit "14" matches nonsense like "ABBY LANE 14 (cross)".
+    if (numTerms.length && (streetHasType || hitName)) {
+      const streetParts = s.street.split(/\(/)[0]; // ignore (...) ranges
+      for (const n of numTerms) {
+        if (new RegExp('\\b' + n + '\\b').test(streetParts)) { score += 30; matched++; }
+      }
+    }
+    if (nameTerms[0] && street.startsWith(nameTerms[0])) score += 5;
+    if (allInStreet && nameTerms.length > 0) score += 30;
+    // House-number-in-block: only when the street's NAME actually matched the query.
+    // (Type-only relevance like "any ROAD" is too loose — would pull unrelated INGRAM
+    // ROAD just because 4321 falls inside its range.)
+    if (houseNum != null && hitName) {
+      const r = parseBlockRange(s.street);
+      if (r && houseNum >= r.lo && houseNum <= r.hi) score += 15;
+    }
+
+    // Count "extra" words in the street name beyond what the query asked for.
+    // Smaller is better — gives the tiebreaker that prefers
+    // "COBBS FORD ROAD" over "COBBS FORD SERVICE ROAD" for query "cobbs ford rd".
+    const streetWords = s.street.split(/[\s()\-/]+/).filter(Boolean);
+    const queryWordsLC = new Set(terms);
+    let extras = 0;
+    for (const w of streetWords) {
+      const lw = w.toLowerCase();
+      if (queryWordsLC.has(lw)) continue;
+      // Aliases: e.g. RD in street should match query "road", and vice versa.
+      if (ALIAS_TO_CANONICAL[lw]) {
+        const canon = ALIAS_TO_CANONICAL[lw];
+        const queryHasType = [...queryWordsLC].some(q => ALIAS_TO_CANONICAL[q] === canon);
+        if (queryHasType) continue;
+      }
+      // Numbers / parenthetical block ranges aren't "extra meaning".
+      if (/^\d+$/.test(lw)) continue;
+      if (lw === 'blk') continue;
+      extras++;
+    }
+    return { ...s, _score: score, _matched: matched, _extras: extras };
+  });
+  return scored
+    .filter(x => x._matched > 0 && x._score >= 10)
+    .sort((a, b) => b._score - a._score
+                || a._extras - b._extras
+                || a.street.length - b.street.length
+                || a.street.localeCompare(b.street))
+    .slice(0, 12);
+}
+
+// ---------- Rendering ----------
+const $ = id => document.getElementById(id);
+
+function renderResults(items, opts = {}) {
+  const wrap = $('results');
+  wrap.innerHTML = '';
+  $('resultsTitle').style.display = items.length ? 'block' : 'none';
+  if (!items.length) {
+    if (opts.queryEmpty) return;
+    wrap.innerHTML = '<div class="panel empty">No matching streets found.</div>';
+    return;
+  }
+  items.forEach((it, idx) => {
+    const div = document.createElement('div');
+    div.className = 'result';
+    const sta = it.sta.replace(/[^0-9]/g, '').charAt(0) || '1';
+    // Strip any "(NN - NN BLK)" range from the street for the maps URL —
+    // Google/Apple Maps don't understand it.
+    const streetForMaps = it.street.replace(/\s*\(.*?\)\s*$/, '').trim();
+    const houseForMaps = lastParsed && lastParsed.house ? lastParsed.house : '';
+    const mapsUrl = buildMapsUrl(houseForMaps, streetForMaps);
+    div.innerHTML = `
+      <div class="badge s${sta}">
+        <div class="v">${it.sta}</div>
+        <div class="l">Station</div>
+      </div>
+      <div class="details">
+        <div class="street">${escapeHtml(it.street)}</div>
+        <div class="meta">
+          ${it.page ? `<span class="pg">📄 Page ${escapeHtml(it.page)}</span>` : '<span style="color:#aaa;">no page</span>'}
+          ${it.crossStreet ? ` &nbsp;·&nbsp; 🛣️ ${escapeHtml(it.crossStreet)}` : ''}
+        </div>
+      </div>
+      <a class="nav-btn" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Navigate ${IS_IOS ? '(Apple Maps)' : '(Google Maps)'}">
+        <span class="nav-icon">🧭</span>
+        <span class="nav-label">${IS_IOS ? 'Apple' : 'Google'}<br>Maps</span>
+      </a>
+    `;
+    // Clicking the row (anywhere except the nav link) opens the map page.
+    if (it.page && labelToIndex[it.page] != null) {
+      div.addEventListener('click', (e) => {
+        if (e.target.closest('.nav-btn')) return;  // let the link do its thing
+        showMapPage(it.page, div);
+      });
+      if (idx === 0 && opts.autoOpen) showMapPage(it.page, div);
+    } else {
+      div.style.opacity = 0.7;
+    }
+    wrap.appendChild(div);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showMapPage(label, clickedEl) {
+  if (labelToIndex[label] == null) return;
+  currentLabel = label;
+  $('viewer').classList.add('show');
+  $('vpLabel').textContent = label;
+  const idx = labelToIndex[label];
+  const padded = String(idx).padStart(3, '0');
+  const img = $('vpImg');
+  $('vpWrap').classList.add('loading');
+  img.src = `maps/pdf_${padded}.jpg`;
+  img.onload = () => $('vpWrap').classList.remove('loading');
+  img.onerror = () => $('vpWrap').classList.remove('loading');
+
+  // Highlight active
+  document.querySelectorAll('.result.active').forEach(el => el.classList.remove('active'));
+  if (clickedEl) clickedEl.classList.add('active');
+
+  // Scroll viewer into view smoothly
+  $('viewer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function adjacentLabel(label, dir) {
+  const i = sortedLabels.indexOf(label);
+  if (i < 0) return null;
+  const j = i + dir;
+  if (j < 0 || j >= sortedLabels.length) return null;
+  return sortedLabels[j];
+}
+
+function populatePageJumpList() {
+  const el = $('pageJumpList');
+  el.innerHTML = sortedLabels.map(l => `<a href="#" data-pg="${l}" style="color: var(--primary); text-decoration: none; padding: 0.1rem 0.35rem; background: rgba(0,229,255,0.07); border-radius: 4px; display: inline-block; margin: 0.1rem;">${l}</a>`).join(' ');
+  el.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-pg]');
+    if (!a) return;
+    e.preventDefault();
+    showMapPage(a.dataset.pg);
+  });
+}
+
+// ---------- Tabs ----------
+function setTab(name) {
+  for (const t of document.querySelectorAll('.tab')) {
+    t.classList.toggle('active', t.dataset.tab === name);
+  }
+  $('tab-alert').style.display  = name === 'alert'  ? 'block' : 'none';
+  $('tab-search').style.display = name === 'search' ? 'block' : 'none';
+  $('tab-browse').style.display = name === 'browse' ? 'block' : 'none';
+  // When switching, don't wipe results — but in browse mode hide them.
+  if (name === 'search') {
+    setTimeout(() => $('searchInput').focus(), 50);
+    runSearch($('searchInput').value);
+  } else if (name === 'browse') {
+    $('results').innerHTML = '';
+    $('resultsTitle').style.display = 'none';
+  }
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
+
+// ---------- Alert tab ----------
+function runAlert() {
+  const txt = $('alertText').value.trim();
+  if (!txt) {
+    $('parsedBox').style.display = 'none';
+    renderResults([]);
+    return;
+  }
+  const parsed = extractAddress(txt);
+  lastParsed = parsed;
+  const box = $('parsedBox');
+  if (!parsed) {
+    box.style.display = 'block';
+    box.style.color = 'var(--red)';
+    box.style.borderColor = 'rgba(255,59,59,0.3)';
+    box.style.background = 'rgba(255,59,59,0.08)';
+    box.innerHTML = "Couldn't find an address in that text. Try the <b>Search Address</b> tab and type the street name manually.";
+    renderResults([]);
+    return;
+  }
+  box.style.display = 'block';
+  box.style.color = 'var(--green)';
+  box.style.borderColor = 'rgba(0,255,136,0.25)';
+  box.style.background = 'rgba(0,255,136,0.08)';
+  box.innerHTML =
+    (parsed.house ? `<b>${parsed.house}</b> ` : '') +
+    `<b>${escapeHtml(parsed.street)}</b>` +
+    (parsed.crossStreet ? `<br><span style="color: var(--dim);">Cross: ${escapeHtml(parsed.crossStreet)}</span>` : '');
+
+  // Search by street + cross street, with the parsed house number for block disambiguation.
+  const items = searchStreets(
+    parsed.street + (parsed.crossStreet ? ' ' + parsed.crossStreet : ''),
+    { houseNum: parsed.house }
+  );
+  renderResults(items, { autoOpen: true });
+}
+$('btnExtract').addEventListener('click', runAlert);
+$('btnClear').addEventListener('click', () => {
+  $('alertText').value = '';
+  $('parsedBox').style.display = 'none';
+  renderResults([]);
+  $('viewer').classList.remove('show');
+});
+$('btnPaste').addEventListener('click', async () => {
+  try {
+    const t = await navigator.clipboard.readText();
+    $('alertText').value = t;
+    runAlert();
+  } catch {
+    alert('Clipboard read denied. Long-press the text box and Paste manually.');
+  }
+});
+$('alertText').addEventListener('paste', () => setTimeout(runAlert, 30));
+$('alertText').addEventListener('input', () => {
+  // Avoid running on every keypress — debounce.
+  clearTimeout(window._alertDebounce);
+  window._alertDebounce = setTimeout(runAlert, 350);
+});
+
+// ---------- Search tab ----------
+function runSearch(q) {
+  // For the manual search tab, pull a leading house number out of the query
+  // so the Navigate button gets a complete address.
+  const m = q.match(/^\s*(\d{1,6})\s+/);
+  lastParsed = { house: m ? m[1] : null, street: q.replace(/^\s*\d{1,6}\s+/, '').trim(), crossStreet: null, raw: q };
+  const items = searchStreets(q, { houseNum: m ? m[1] : null });
+  renderResults(items, { queryEmpty: !q.trim() });
+}
+$('searchInput').addEventListener('input', e => runSearch(e.target.value));
+
+// ---------- Browse tab ----------
+$('pageJumpInput').addEventListener('input', e => {
+  const v = e.target.value.trim().toUpperCase();
+  if (!v) return;
+  // Try exact match first
+  if (labelToIndex[v] != null) {
+    showMapPage(v);
+    return;
+  }
+  // Try numeric prefix
+  const candidates = sortedLabels.filter(l => l.startsWith(v));
+  if (candidates.length === 1) showMapPage(candidates[0]);
+});
+$('pageJumpInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const v = e.target.value.trim().toUpperCase();
+    if (labelToIndex[v] != null) showMapPage(v);
+  }
+});
+
+// ---------- Viewer controls ----------
+$('vpPrev').addEventListener('click', () => {
+  const n = adjacentLabel(currentLabel, -1);
+  if (n) showMapPage(n);
+});
+$('vpNext').addEventListener('click', () => {
+  const n = adjacentLabel(currentLabel, +1);
+  if (n) showMapPage(n);
+});
+$('vpOpen').addEventListener('click', () => {
+  if (!currentLabel) return;
+  const idx = labelToIndex[currentLabel];
+  const padded = String(idx).padStart(3, '0');
+  window.open(`maps/pdf_${padded}.jpg`, '_blank');
+});
+
+// ---------- URL / Share Target / autorun ----------
+function handleIncomingParams() {
+  const params = new URLSearchParams(window.location.search);
+  // Share Target may pass alert text in title/text/url
+  const sharedText = [params.get('text'), params.get('title'), params.get('url'), params.get('q')]
+    .filter(Boolean).join(' ').trim();
+  if (sharedText) {
+    $('alertText').value = sharedText;
+    setTab('alert');
+    runAlert();
+  }
+}
+
+// ---------- Service worker / PWA install ----------
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('installBtn').style.display = 'block';
+});
+$('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') $('installBtn').style.display = 'none';
+  deferredPrompt = null;
+});
+
+// Debug exposure
+window.__mb = {
+  get streets() { return streets; },
+  get labelToIndex() { return labelToIndex; },
+  searchStreets,
+  extractAddress,
+};
+
+// ---------- Boot ----------
+loadData().then(() => {
+  handleIncomingParams();
+}).catch(err => {
+  console.error(err);
+  $('hint').classList.add('show');
+  $('hint').innerHTML = "⚠️ Couldn't load mapbook data. If this is your first time and you're opening the file directly, you need to host it on a web server (see README).";
+});
+})();
+</script>
+</body>
+</html>

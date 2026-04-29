@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Millbrook Dispatch Mapbook</title>
+    <style>
+        :root {
+            --primary-color: #00e5ff;
+            --bg-dark: #0f172a;
+            --bg-panel: rgba(30, 41, 59, 0.9);
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-red: #ff3b3b;
+            --accent-orange: #ff9d00;
+            --accent-green: #00ff88;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.2rem;
+            text-transform: uppercase;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .territory-badge {
+            flex-shrink: 0;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a25;
+            border: 2px solid var(--primary-color);
+        }
+
+        .territory-badge.sta-2 { border-color: var(--accent-green); }
+        .territory-badge.sta-3 { border-color: var(--accent-orange); }
+        .territory-badge.sta-4 { border-color: var(--accent-red); }
+
+        .sta-val {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .territory-badge.sta-1 .sta-val { color: var(--primary-color); }
+        .territory-badge.sta-2 .sta-val { color: var(--accent-green); }
+        .territory-badge.sta-3 .sta-val { color: var(--accent-orange); }
+        .territory-badge.sta-4 .sta-val { color: var(--accent-red); }
+
+        .sta-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .details { flex-grow: 1; }
+        .street-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .meta-info { font-size: 0.85rem; color: var(--text-dim); }
+        .meta-item { margin-bottom: 0.2rem; }
+        .meta-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Millbrook Dispatch</h1>
+            <p class="subtitle">Offline Mapbook Tool</p>
+        </header>
+
+        <input type="text" id="searchInput" class="search-input" placeholder="Paste address here..." autofocus>
+        
+        <div id="results" class="results-container"></div>
+    </div>
+
+    <script>
+        let db = [];
+
+        // Load data synchronously
+        fetch('data.json')
+            .then(r => r.json())
+            .then(data => {
+                db = data.map(item => ({
+                    ...item,
+                    searchStr: `${item.street} ${item.crossStreet || ''}`.toLowerCase()
+                }));
+                // Check if URL has query
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('q')) {
+                    document.getElementById('searchInput').value = params.get('q');
+                    doSearch(params.get('q'));
+                }
+            });
+
+        const input = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+
+        input.addEventListener('input', (e) => doSearch(e.target.value));
+
+        function doSearch(query) {
+            resultsDiv.innerHTML = '';
+            if (!query.trim()) return;
+
+            const cleanQuery = query.toLowerCase().replace(/[,.]/g, '');
+            const terms = cleanQuery.split(/\s+/).filter(term => {
+                if (/^\d+$/.test(term)) return false;
+                if (['al', 'alabama', 'millbrook', 'deatsville', 'deatsvile', 'prattville', 'coosada'].includes(term)) return false;
+                if (term.length < 2 && !['n','s','e','w'].includes(term)) return false;
+                return true;
+            });
+
+            if (terms.length === 0) return;
+
+            const scoredData = db.map(item => {
+                let score = 0;
+                let matchedTerms = 0;
+                terms.forEach(term => {
+                    if (item.street.toLowerCase().includes(term)) { score += 10; matchedTerms++; }
+                    else if (item.crossStreet && item.crossStreet.toLowerCase().includes(term)) { score += 3; matchedTerms++; }
+                    else if (item.searchStr.includes(term)) { score += 1; matchedTerms++; }
+                });
+                return { ...item, score, matchedTerms };
+            });
+
+            const results = scoredData.filter(i => i.matchedTerms > 0).sort((a, b) => b.score - a.score).slice(0, 10);
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="text-align:center; color:gray; padding: 2rem;">No matching streets found.</div>';
+                return;
+            }
+
+            results.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="territory-badge sta-${item.sta}">
+                        <div class="sta-val">${item.sta}</div>
+                        <div class="sta-label">Station</div>
+                    </div>
+                    <div class="details">
+                        <div class="street-name">${item.street}</div>
+                        <div class="meta-info">
+                            ${item.page ? `<div class="meta-item"><span class="meta-icon">📄</span> <strong>Page:</strong> ${item.page}</div>` : ''}
+                            ${item.crossStreet ? `<div class="meta-item"><span class="meta-icon">🛣️</span> <strong>Cross:</strong> ${item.crossStreet}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                resultsDiv.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

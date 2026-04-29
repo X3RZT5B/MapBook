@@ -1,0 +1,27 @@
+{
+  "name": "Millbrook Dispatch Mapbook",
+  "short_name": "Mapbook",
+  "description": "Address-to-territory and map page lookup for Millbrook Fire Department.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0f1c",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    { "name": "Browse Pages", "url": "./index.html#browse" },
+    { "name": "Search Address", "url": "./index.html#search" }
+  ]
+}

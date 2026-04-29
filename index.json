@@ -1,0 +1,521 @@
+{
+  "totalPages": 154,
+  "firstMapIndex": 32,
+  "labelToIndex": {
+    "1": 61,
+    "1A": 127,
+    "2": 36,
+    "3": 49,
+    "4": 33,
+    "4A": 141,
+    "5": 54,
+    "6": 104,
+    "7": 37,
+    "7A": 56,
+    "8": 97,
+    "9": 50,
+    "10": 39,
+    "12": 140,
+    "14": 128,
+    "15": 51,
+    "28": 146,
+    "40": 58,
+    "46": 102,
+    "69": 82,
+    "77": 87,
+    "86": 95,
+    "99": 120,
+    "105": 121,
+    "115": 117
+  },
+  "detections": [
+    {
+      "pdfIndex": 32,
+      "label": null
+    },
+    {
+      "pdfIndex": 33,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 34,
+      "label": null
+    },
+    {
+      "pdfIndex": 35,
+      "label": null
+    },
+    {
+      "pdfIndex": 36,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 37,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 38,
+      "label": null
+    },
+    {
+      "pdfIndex": 39,
+      "label": "10"
+    },
+    {
+      "pdfIndex": 40,
+      "label": null
+    },
+    {
+      "pdfIndex": 41,
+      "label": null
+    },
+    {
+      "pdfIndex": 42,
+      "label": null
+    },
+    {
+      "pdfIndex": 43,
+      "label": null
+    },
+    {
+      "pdfIndex": 44,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 45,
+      "label": null
+    },
+    {
+      "pdfIndex": 46,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 47,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 48,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 49,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 50,
+      "label": "9"
+    },
+    {
+      "pdfIndex": 51,
+      "label": "15"
+    },
+    {
+      "pdfIndex": 52,
+      "label": null
+    },
+    {
+      "pdfIndex": 53,
+      "label": null
+    },
+    {
+      "pdfIndex": 54,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 55,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 56,
+      "label": "7A"
+    },
+    {
+      "pdfIndex": 57,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 58,
+      "label": "40"
+    },
+    {
+      "pdfIndex": 59,
+      "label": null
+    },
+    {
+      "pdfIndex": 60,
+      "label": null
+    },
+    {
+      "pdfIndex": 61,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 62,
+      "label": null
+    },
+    {
+      "pdfIndex": 63,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 64,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 65,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 66,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 67,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 68,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 69,
+      "label": null
+    },
+    {
+      "pdfIndex": 70,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 71,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 72,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 73,
+      "label": null
+    },
+    {
+      "pdfIndex": 74,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 75,
+      "label": null
+    },
+    {
+      "pdfIndex": 76,
+      "label": "9"
+    },
+    {
+      "pdfIndex": 77,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 78,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 79,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 80,
+      "label": null
+    },
+    {
+      "pdfIndex": 81,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 82,
+      "label": "69"
+    },
+    {
+      "pdfIndex": 83,
+      "label": null
+    },
+    {
+      "pdfIndex": 84,
+      "label": null
+    },
+    {
+      "pdfIndex": 85,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 86,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 87,
+      "label": "77"
+    },
+    {
+      "pdfIndex": 88,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 89,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 90,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 91,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 92,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 93,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 94,
+      "label": null
+    },
+    {
+      "pdfIndex": 95,
+      "label": "86"
+    },
+    {
+      "pdfIndex": 96,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 97,
+      "label": "8"
+    },
+    {
+      "pdfIndex": 98,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 99,
+      "label": null
+    },
+    {
+      "pdfIndex": 100,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 101,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 102,
+      "label": "46"
+    },
+    {
+      "pdfIndex": 103,
+      "label": "9"
+    },
+    {
+      "pdfIndex": 104,
+      "label": "6"
+    },
+    {
+      "pdfIndex": 105,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 106,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 107,
+      "label": "9"
+    },
+    {
+      "pdfIndex": 108,
+      "label": null
+    },
+    {
+      "pdfIndex": 109,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 110,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 111,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 112,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 113,
+      "label": null
+    },
+    {
+      "pdfIndex": 114,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 115,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 116,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 117,
+      "label": "115"
+    },
+    {
+      "pdfIndex": 118,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 119,
+      "label": null
+    },
+    {
+      "pdfIndex": 120,
+      "label": "99"
+    },
+    {
+      "pdfIndex": 121,
+      "label": "105"
+    },
+    {
+      "pdfIndex": 122,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 123,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 124,
+      "label": null
+    },
+    {
+      "pdfIndex": 125,
+      "label": null
+    },
+    {
+      "pdfIndex": 126,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 127,
+      "label": "1A"
+    },
+    {
+      "pdfIndex": 128,
+      "label": "14"
+    },
+    {
+      "pdfIndex": 129,
+      "label": null
+    },
+    {
+      "pdfIndex": 130,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 131,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 132,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 133,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 134,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 135,
+      "label": null
+    },
+    {
+      "pdfIndex": 136,
+      "label": "5"
+    },
+    {
+      "pdfIndex": 137,
+      "label": "8"
+    },
+    {
+      "pdfIndex": 138,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 139,
+      "label": "1"
+    },
+    {
+      "pdfIndex": 140,
+      "label": "12"
+    },
+    {
+      "pdfIndex": 141,
+      "label": "4A"
+    },
+    {
+      "pdfIndex": 142,
+      "label": null
+    },
+    {
+      "pdfIndex": 143,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 144,
+      "label": null
+    },
+    {
+      "pdfIndex": 145,
+      "label": "2"
+    },
+    {
+      "pdfIndex": 146,
+      "label": "28"
+    },
+    {
+      "pdfIndex": 147,
+      "label": "3"
+    },
+    {
+      "pdfIndex": 148,
+      "label": "7"
+    },
+    {
+      "pdfIndex": 149,
+      "label": "14"
+    },
+    {
+      "pdfIndex": 150,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 151,
+      "label": null
+    },
+    {
+      "pdfIndex": 152,
+      "label": "4"
+    },
+    {
+      "pdfIndex": 153,
+      "label": "6"
+    }
+  ]
+}
